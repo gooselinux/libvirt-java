@@ -1,0 +1,36 @@
+commit 3c69d217c6e38cb90c93f005ed820b20c7672732
+Author: Bryan Kearney <bkearney@redhat.com>
+Date:   Thu Jul 8 12:24:42 2010 -0400
+
+    Arrays.copyOf is a 1.6 feature. Need to ensure this builds against 1.5
+
+diff --git a/src/main/java/org/libvirt/SchedParameter.java b/src/main/java/org/libvirt/SchedParameter.java
+index d841238..7ac6234 100644
+--- a/src/main/java/org/libvirt/SchedParameter.java
++++ b/src/main/java/org/libvirt/SchedParameter.java
+@@ -47,7 +47,7 @@ public abstract class SchedParameter {
+     public static virSchedParameter toNative(SchedParameter param) {
+         virSchedParameter returnValue = new virSchedParameter();
+         returnValue.value = new virSchedParameterValue();
+-        returnValue.field = Arrays.copyOf(param.field.getBytes(), Libvirt.VIR_DOMAIN_SCHED_FIELD_LENGTH);
++        returnValue.field = copyOf(param.field.getBytes(), Libvirt.VIR_DOMAIN_SCHED_FIELD_LENGTH);
+         returnValue.type = param.getType();
+         switch (param.getType()) {
+             case (1):
+@@ -72,6 +72,16 @@ public abstract class SchedParameter {
+         }
+         return returnValue;
+     }
++    
++    public static byte[] copyOf(byte[] original, int length) {
++        byte[] returnValue = new byte[length];
++        int originalLength = original.length ;
++        Arrays.fill(returnValue, (byte)0);
++        for (int x = 0 ; x < originalLength ; x++) {
++            returnValue[x] = original[x] ;
++        }
++        return returnValue ;
++    }
+ 
+     /**
+      * Parameter name
